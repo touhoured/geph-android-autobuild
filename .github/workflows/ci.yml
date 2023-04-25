@@ -34,39 +34,55 @@ jobs:
     env:
       upstream: geph-official/geph-android
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        repository: ${{ env.upstream }}
-        fetch-depth: 0
-        submodules: true
-    - name: set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: gradle
-    - name: get binary
-      run: |
-        export PREFIX="https://github.com/touhoured/geph4-client-autobuild/releases/latest/download"
-        PREBUILD="./prebuild"
-        ARM_DIR=$PREBUILD"/armeabi-v7a"
-        ARM64_DIR=$PREBUILD"/arm64-v8a"
-        TARGET="libgeph.so"
-        mkdir -p $ARM_DIR
-        mkdir -p $ARM64_DIR
-        curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi.7z"
-        curl -OL "$PREFIX/geph4-client-aarch64-linux-android.7z"
-        7z e "geph4-client-armv7-linux-androideabi.7z" -o$ARM_DIR/$TARGET
-        7z e "geph4-client-aarch64-linux-android.7z" -o$ARM64_DIR/$TARGET
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.upstream }}
+          fetch-depth: 0
+          submodules: true
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "temurin"
+          cache: gradle
+      - name: get binary
+        run: |
+          export PREFIX="https://github.com/touhoured/geph4-client-autobuild/releases/latest/download"
+          PREBUILD="./prebuild"
+          ARM_DIR=$PREBUILD"/armeabi-v7a"
+          ARM64_DIR=$PREBUILD"/arm64-v8a"
+          TARGET="libgeph.so"
+          mkdir -p $ARM_DIR
+          mkdir -p $ARM64_DIR
+          curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi.7z"
+          curl -OL "$PREFIX/geph4-client-aarch64-linux-android.7z"
+          7z e "geph4-client-armv7-linux-androideabi.7z" -o$ARM_DIR/$TARGET
+          7z e "geph4-client-aarch64-linux-android.7z" -o$ARM64_DIR/$TARGET
 
-    - name: npm build
-      working-directory: gephgui
-      run: |
-        npm install
-        npm run build
+      - name: npm build
+        working-directory: gephgui
+        run: |
+          npm install
+          npm run build
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew build
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.bin }}-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/${{ env.bin }}
+      - name: Compression
+        working-directory: target/${{ matrix.target }}/release
+        run: |
+          7z a ${{ env.bin }}-${{ matrix.target }}.7z ${{ env.bin }}
+      - name: Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.date }}
+          tag_name: archive-${{ env.hash }}
+          target_commitish: ${{ env.full_name }}
+          files: target/${{ matrix.target }}/release/${{ env.bin }}-${{ matrix.target }}.7z
