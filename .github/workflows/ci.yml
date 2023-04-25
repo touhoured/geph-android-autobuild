@@ -26,8 +26,8 @@ jobs:
           git push -f
           git push --tags -f
 
-
   build:
+    name: build
     runs-on: ubuntu-latest
     env:
       upstream: geph-official/geph-android
@@ -44,7 +44,6 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: gradle
-
     - name: get binary
       run: |
         export PREFIX="https://github.com/touhoured/geph4-client-autobuild/releases/latest/download"
