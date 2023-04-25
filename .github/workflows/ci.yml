@@ -46,7 +46,7 @@ jobs:
         cache: gradle
 
     - name: get binary
-    - run: |
+      run: |
         export PREFIX="https://github.com/touhoured/geph4-client-autobuild/releases/latest/download"
         PREBUILD="./prebuild"
         ARM_DIR=$PREBUILD"/armeabi-v7a"
@@ -69,4 +69,3 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
-
