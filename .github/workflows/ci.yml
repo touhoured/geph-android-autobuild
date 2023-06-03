@@ -55,10 +55,10 @@ jobs:
           TARGET="libgeph.so"
           mkdir -p $ARM_DIR
           mkdir -p $ARM64_DIR
-          curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi.7z"
-          curl -OL "$PREFIX/geph4-client-aarch64-linux-android.7z"
-          7z e "geph4-client-armv7-linux-androideabi.7z" -o$ARM_DIR/$TARGET
-          7z e "geph4-client-aarch64-linux-android.7z" -o$ARM64_DIR/$TARGET
+          curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi.tar.gz"
+          curl -OL "$PREFIX/geph4-client-aarch64-linux-android.tar.gz"
+          tar -xf "geph4-client-armv7-linux-androideabi.tar.gz" $ARM_DIR/$TARGET
+          tar -xf "geph4-client-aarch64-linux-android.tar.gz" $ARM64_DIR/$TARGET
 
       - name: npm build
         working-directory: gephgui
