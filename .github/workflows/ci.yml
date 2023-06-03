@@ -46,17 +46,17 @@ jobs:
           java-version: "11"
           distribution: "temurin"
           cache: gradle
-      - name: get binary
+      - name: Get binary
         run: |
-          export PREFIX="https://github.com/touhoured/geph4-client-autobuild/releases/latest/download"
+          export PREFIX="https://github.com/touhoured/geph4-client-autobuild/releases/download/daily"
           PREBUILD="./prebuild"
           ARM_DIR=$PREBUILD"/armeabi-v7a"
           ARM64_DIR=$PREBUILD"/arm64-v8a"
           TARGET="libgeph.so"
           mkdir -p $ARM_DIR
           mkdir -p $ARM64_DIR
-          curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi.tar.gz"
-          curl -OL "$PREFIX/geph4-client-aarch64-linux-android.tar.gz"
+          curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi"
+          curl -OL "$PREFIX/geph4-client-aarch64-linux-android"
           tar -xf "geph4-client-armv7-linux-androideabi.tar.gz" $ARM_DIR/$TARGET
           tar -xf "geph4-client-aarch64-linux-android.tar.gz" $ARM64_DIR/$TARGET
 
