@@ -55,8 +55,8 @@ jobs:
           TARGET="libgeph.so"
           mkdir -p $ARM_DIR
           mkdir -p $ARM64_DIR
-          curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi" $ARM_DIR/$TARGET/geph4-client
-          curl -OL "$PREFIX/geph4-client-aarch64-linux-android" $ARM64_DIR/$TARGET/geph4-client
+          curl -OL "$PREFIX/geph4-client-armv7-linux-androideabi" $ARM_DIR/$TARGET
+          curl -OL "$PREFIX/geph4-client-aarch64-linux-android" $ARM64_DIR/$TARGET
 
       - name: NPM build
         working-directory: gephgui
