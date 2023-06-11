@@ -11,22 +11,35 @@ permissions:
   contents: write
 
 jobs:
-  sync:
-    name: Sync
+  common:
+    name: common
     runs-on: ubuntu-latest
-    env:
-      upstream: geph-official/geph-android
+    outputs:
+      date: ${{ steps.getenv.outputs.date }}
+      hash: ${{ steps.getenv.outputs.hash }}
+      full_hash: ${{ steps.getenv.outputs.full_hash }}
+      tag_name: ${{ steps.getenv.outputs.tag_name }}
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           ref: master
-      - name: Sync
+          fetch-depth: 0
+
+      - name: Reset to Input HEAD
+        if: inputs.reset_head != null
+        run: git reset --hard ${{ inputs.reset_head }}
+
+      - name: Get environment variable
+        id: getenv
+        shell: bash
         run: |
-          git remote add upstream https://github.com/$upstream.git
-          git fetch upstream
-          # git reset --hard $(git log --all --pretty=format:'%H' -n 1)
-          git push -f
-          git push --tags -f
+          echo "date=$(date -I)" >> "$GITHUB_OUTPUT"
+          echo "hash=$(git log --pretty=format:%h -n 1)" >> "$GITHUB_OUTPUT"
+          echo "full_hash=$(git log --pretty=format:%H -n 1)" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$(git describe --tags)" >> "$GITHUB_OUTPUT"
+
 
   build:
     name: Build
@@ -40,12 +53,23 @@ jobs:
           repository: ${{ env.upstream }}
           fetch-depth: 0
           submodules: true
+
+      - name: Get environment variable
+        id: getenv
+        shell: bash
+        run: |
+          echo "date=$(date -I)" >> "$GITHUB_ENV"
+          echo "hash=$(git log --pretty=format:%h -n 1)" >> "$GITHUB_OUTPUT"
+          echo "full_hash=$(git log --pretty=format:%H -n 1)" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$(git describe --tags)" >> "$GITHUB_OUTPUT"
+
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           java-version: "11"
           distribution: "temurin"
           cache: gradle
+
       - name: Get binary
         run: |
           export PREFIX="https://github.com/touhoured/geph4-client-autobuild/releases/download/daily"
@@ -71,22 +95,18 @@ jobs:
 
       - name: test
         run: |
-          ls
           pwd
           find
-          ls ./**
 
       - uses: actions/upload-artifact@v3
         with:
           path: |
-            ./app/build/outputs/apk/release/*.apk
-            ./app/build/outputs/apk/debug/*.apk
-            ./app/build/outputs/apk/releasePlay/*.apk
+            ./app/build/outputs/apk/*/*.apk
 
-      # - name: Releases
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     name: ${{ env.date }}
-      #     tag_name: archive-${{ env.hash }}
-      #     target_commitish: ${{ env.full_name }}
-      #     files: target/${{ matrix.target }}/release/${{ env.bin }}-${{ matrix.target }}.7z
+      - name: Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.date }}
+          tag_name: archive-${{ env.hash }}
+          target_commitish: ${{ env.full_name }}
+          files: ./app/build/outputs/apk/*/*.apk
