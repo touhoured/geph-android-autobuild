@@ -77,6 +77,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: ${{ env.date }}
-          tag_name: archive-${{ env.hash }}
+          tag_name: archive-${{ env.date }}
           target_commitish: ${{ env.full_name }}
           files: ./app/build/outputs/apk/*/*.apk
