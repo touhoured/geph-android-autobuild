@@ -56,7 +56,8 @@ jobs:
         run: |
           curl "https://android.googlesource.com/platform/build/+/master/target/product/security/testkey.x509.pem?format=TEXT" | base64 -d > testkey.509.pem
           curl "https://android.googlesource.com/platform/build/+/master/target/product/security/testkey.pk8?format=TEXT" | base64 -d > testkey.pk8
-
+          cat testkey.509.pem
+          cat testkey.pk8
           name="testkey"
           alias="${name}"
           pk8="${name}.pk8"
@@ -65,8 +66,11 @@ jobs:
           key="${name}.priv.pem"
           keystore="${name}.jks"
           keystorepass="${name}"
+          echo openssl pkcs8 -in ${pk8} -inform DER -out ${key} -outform PEM -nocrypt
           openssl pkcs8 -in ${pk8} -inform DER -out ${key} -outform PEM -nocrypt
+          echo openssl pkcs12 -export -in ${cert} -inkey ${key} -out ${pk12} -name ${alias} -password pass:${keystorepass}
           openssl pkcs12 -export -in ${cert} -inkey ${key} -out ${pk12} -name ${alias} -password pass:${keystorepass}
+          echo keytool -importkeystore -srckeystore "${pk12}" -srcstoretype PKCS12 -srcstorepass "${keystorepass}" -destkeystore "${keystore}" -deststorepass "${keystorepass}"
           keytool -importkeystore -srckeystore "${pk12}" -srcstoretype PKCS12 -srcstorepass "${keystorepass}" -destkeystore "${keystore}" -deststorepass "${keystorepass}"
 
       - name: NPM build
