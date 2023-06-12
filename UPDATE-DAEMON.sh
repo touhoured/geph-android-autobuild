@@ -1,4 +1,4 @@
-#!/bin/sh
+    #!/bin/sh
 
 export PREFIX="https://f001.backblazeb2.com/file/geph-dl/geph4-binaries/v4.7.12"
 
