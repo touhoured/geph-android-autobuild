@@ -81,6 +81,12 @@ jobs:
           name="testkey"
           ls
           ./gradlew build
+          echo           ./gradlew assembleRelease \
+          -Pandroid.injected.signing.store.file="${testkey}.jks" \
+          -Pandroid.injected.signing.store.password="${testkey}" \
+          -Pandroid.injected.signing.key.alias="${testkey}" \
+          -Pandroid.injected.signing.key.password="${testkey}"
+
           ./gradlew assembleRelease \
             -Pandroid.injected.signing.store.file="${testkey}.jks" \
             -Pandroid.injected.signing.store.password="${testkey}" \
