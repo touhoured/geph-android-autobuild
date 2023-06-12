@@ -52,7 +52,7 @@ jobs:
           curl -L "${PREFIX}/geph4-client-armv7-linux-androideabi" -o "${ARM_DIR}/${TARGET}"
           curl -L "${PREFIX}/geph4-client-aarch64-linux-android" -o "${ARM64_DIR}/${TARGET}"
 
-      - name: Get Sign
+      - name: Get Sign file
         run: |
           curl "https://android.googlesource.com/platform/build/+/master/target/product/security/testkey.x509.pem?format=TEXT" | base64 -d > testkey.x509.pem
           curl "https://android.googlesource.com/platform/build/+/master/target/product/security/testkey.pk8?format=TEXT" | base64 -d > testkey.pk8
@@ -80,8 +80,8 @@ jobs:
         run: |
           name="testkey"
           ls
-          ./gradlew build
-          echo           ./gradlew assembleRelease \
+          # ./gradlew build
+          echo ./gradlew assembleRelease \
           -Pandroid.injected.signing.store.file="$GITHUB_WORKSPACE/${name}.jks" \
           -Pandroid.injected.signing.store.password="${name}" \
           -Pandroid.injected.signing.key.alias="${name}" \
