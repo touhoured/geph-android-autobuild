@@ -54,9 +54,9 @@ jobs:
 
       - name: Get Sign
         run: |
-          curl "https://android.googlesource.com/platform/build/+/master/target/product/security/testkey.x509.pem?format=TEXT" | base64 -d > testkey.509.pem
+          curl "https://android.googlesource.com/platform/build/+/master/target/product/security/testkey.x509.pem?format=TEXT" | base64 -d > testkey.x509.pem
           curl "https://android.googlesource.com/platform/build/+/master/target/product/security/testkey.pk8?format=TEXT" | base64 -d > testkey.pk8
-          cat testkey.509.pem
+          cat testkey.x509.pem
           cat testkey.pk8
           name="testkey"
           alias="${name}"
