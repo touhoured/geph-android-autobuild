@@ -82,7 +82,7 @@ jobs:
           ls
           ./gradlew build
           echo           ./gradlew assembleRelease \
-          -Pandroid.injected.signing.store.file="${name}.jks" \
+          -Pandroid.injected.signing.store.file="$GITHUB_WORKSPACE/${name}.jks" \
           -Pandroid.injected.signing.store.password="${name}" \
           -Pandroid.injected.signing.key.alias="${name}" \
           -Pandroid.injected.signing.key.password="${name}"
