@@ -7,15 +7,14 @@ on:
   workflow_dispatch:
 env:
   CARGO_TERM_COLOR: always
-permissions:
-  contents: write
+  upstream: geph-official/geph-android
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    env:
-      upstream: geph-official/geph-android
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
