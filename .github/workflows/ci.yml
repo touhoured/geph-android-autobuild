@@ -77,22 +77,19 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: |
-          name="testkey"
-          ls
           # ./gradlew build
 
           ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file="${name}.jks" \
-            -Pandroid.injected.signing.store.password="${name}" \
-            -Pandroid.injected.signing.key.alias="${name}" \
-            -Pandroid.injected.signing.key.password="${name}"
+            -Pandroid.injected.signing.store.file="testkey.jks" \
+            -Pandroid.injected.signing.store.password="testkey" \
+            -Pandroid.injected.signing.key.alias="testkey" \
+            -Pandroid.injected.signing.key.password="testkey"
 
           echo ./gradlew assembleRelease \
             -Pandroid.injected.signing.store.file="${name}.jks" \
             -Pandroid.injected.signing.store.password="${name}" \
             -Pandroid.injected.signing.key.alias="${name}" \
             -Pandroid.injected.signing.key.password="${name}"
-
       - name: test
         run: |
           pwd
