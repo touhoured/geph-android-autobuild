@@ -74,11 +74,9 @@ jobs:
           npm install
           npm run build
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-        
       - name: Build with Gradle
         run: |
+          chmod +x gradlew
           ./gradlew build
 
       #     echo ./gradlew assembleRelease \
@@ -104,12 +102,6 @@ jobs:
           path: |
             ./app/build/outputs/apk/*/*.apk
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: sign
-          path: |
-            ${{steps.sign_app.outputs.signedReleaseFile}}
-
       - name: Releases
         uses: softprops/action-gh-release@v1
         with:
@@ -118,4 +110,3 @@ jobs:
           target_commitish: ${{ env.full_hash }}
           files: |
             ./app/build/outputs/apk/*/*.apk
-            ${{steps.sign_app.outputs.signedReleaseFile}}
