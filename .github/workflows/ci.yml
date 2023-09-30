@@ -66,8 +66,7 @@ jobs:
           openssl pkcs8 -in ${pk8} -inform DER -out ${key} -outform PEM -nocrypt
           openssl pkcs12 -export -in ${cert} -inkey ${key} -out ${pk12} -name ${alias} -password pass:${keystorepass}
           keytool -importkeystore -srckeystore "${pk12}" -srcstoretype PKCS12 -srcstorepass "${keystorepass}" -destkeystore "${keystore}" -deststorepass "${keystorepass}"
-          mkdir -p app/keystore
-          cp testkey.jks app/keystore/android_keystore.jks
+          echo "keyBase64=$(base64 -w 0 ${name}.jks)" >> "${GITHUB_ENV}"
 
       - name: NPM build
         working-directory: gephgui
@@ -77,30 +76,39 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
-      - name: Build APK
-        run: ./gradlew :app:assembleRelease -x test
-        env:
-          SIGNING_KEY_ALIAS: testkey
-          SIGNING_KEY_PASSWORD: testkey
-          SIGNING_STORE_PASSWORD: testkey
-
         
-      # - name: Build with Gradle
-      #   run: |
-      #     # ./gradlew build
+      - name: Build with Gradle
+        run: |
+          ./gradlew build
 
-      #     ./gradlew assembleRelease
       #     echo ./gradlew assembleRelease \
       #       -Pandroid.injected.signing.store.file="${name}.jks" \
       #       -Pandroid.injected.signing.store.password="${name}" \
       #       -Pandroid.injected.signing.key.alias="${name}" \
       #       -Pandroid.injected.signing.key.password="${name}"
 
+      - uses: r0adkll/sign-android-release@v1
+        name: Sign app APK
+        # ID used to access action output
+        id: sign_app
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ env.keyBase64 }}
+          alias: testkey
+          keyStorePassword: testkey
+          keyPassword: testkey
+
       - uses: actions/upload-artifact@v3
         with:
+          name: build
           path: |
             ./app/build/outputs/apk/*/*.apk
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: sign
+          path: |
+            ${{steps.sign_app.outputs.signedReleaseFile}}
 
       - name: Releases
         uses: softprops/action-gh-release@v1
@@ -108,4 +116,6 @@ jobs:
           name: ${{ env.date }}
           tag_name: archive-${{ env.hash }}
           target_commitish: ${{ env.full_hash }}
-          files: ./app/build/outputs/apk/*/*.apk
+          files: |
+            ./app/build/outputs/apk/*/*.apk
+            ${{steps.sign_app.outputs.signedReleaseFile}}
