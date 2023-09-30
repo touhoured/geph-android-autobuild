@@ -66,6 +66,8 @@ jobs:
           openssl pkcs8 -in ${pk8} -inform DER -out ${key} -outform PEM -nocrypt
           openssl pkcs12 -export -in ${cert} -inkey ${key} -out ${pk12} -name ${alias} -password pass:${keystorepass}
           keytool -importkeystore -srckeystore "${pk12}" -srcstoretype PKCS12 -srcstorepass "${keystorepass}" -destkeystore "${keystore}" -deststorepass "${keystorepass}"
+          mkdir -p app/keystore
+          cp testkey.jks app/keystore/android_keystore.jks
 
       - name: NPM build
         working-directory: gephgui
@@ -75,25 +77,25 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build with Gradle
-        run: |
-          # ./gradlew build
 
-          ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file="testkey.jks" \
-            -Pandroid.injected.signing.store.password="testkey" \
-            -Pandroid.injected.signing.key.alias="testkey" \
-            -Pandroid.injected.signing.key.password="testkey"
+      - name: Build APK
+        run: ./gradlew :app:assembleRelease -x test
+        env:
+          SIGNING_KEY_ALIAS: testkey
+          SIGNING_KEY_PASSWORD: testkey
+          SIGNING_STORE_PASSWORD: testkey
 
-          echo ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file="${name}.jks" \
-            -Pandroid.injected.signing.store.password="${name}" \
-            -Pandroid.injected.signing.key.alias="${name}" \
-            -Pandroid.injected.signing.key.password="${name}"
-      - name: test
-        run: |
-          pwd
-          find .
+        
+      # - name: Build with Gradle
+      #   run: |
+      #     # ./gradlew build
+
+      #     ./gradlew assembleRelease
+      #     echo ./gradlew assembleRelease \
+      #       -Pandroid.injected.signing.store.file="${name}.jks" \
+      #       -Pandroid.injected.signing.store.password="${name}" \
+      #       -Pandroid.injected.signing.key.alias="${name}" \
+      #       -Pandroid.injected.signing.key.password="${name}"
 
       - uses: actions/upload-artifact@v3
         with:
