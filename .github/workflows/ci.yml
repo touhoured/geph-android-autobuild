@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ env.upstream }}
-          fetch-tags: true
+          fetch-depth: 0
           submodules: true
 
       - name: Get environment variable
