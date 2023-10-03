@@ -65,7 +65,7 @@ jobs:
           keystorepass="${name}"
           openssl pkcs8 -in "${pk8}" -inform DER -out "${key}" -outform PEM -nocrypt
           openssl pkcs12 -export -in "${cert}" -inkey $"{key}" -out "${pk12}" -name "${alias}" -password pass:${keystorepass}
-          keytool -importkeystore -srckeystore "${pk12}" -srcstoretype PKCS12 -srcstorepass "${keystorepass}" -destkeystore "${keystore}" -deststorepass "${keystorepass}"
+          keytool -importkeystore -srckeystore "${pk12}" -srcstoretype PKCS12 -srcstorepass ${keystorepass} -destkeystore "${keystore}" -deststorepass ${keystorepass}
           echo "keyBase64=$(base64 -w 0 ${name}.jks)" >> "${GITHUB_ENV}"
 
       - name: NPM build
