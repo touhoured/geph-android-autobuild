@@ -23,7 +23,7 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - uses: actions/setup-node@v6
+    - run: bash PREBUILD.sh
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
